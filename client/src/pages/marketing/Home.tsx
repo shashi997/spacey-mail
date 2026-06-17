@@ -1,15 +1,35 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   EnvelopeSimpleOpenIcon,
+  EnvelopeSimpleIcon,
   UsersIcon,
   PaletteIcon,
   SmileyWinkIcon,
   PrinterIcon,
   TruckIcon,
   ArrowUpRightIcon,
+  SquaresFourIcon,
 } from "@phosphor-icons/react";
 
 const Home = () => {
+
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+
+  const handleStartLetter = () => {
+    navigate("/letter");
+  };
+
+  const handleSecondaryCTA = () => {
+    if(currentUser){
+      navigate("/dashboard");
+    }else{
+      navigate("/register");
+    }
+  };
+
   const features = [
     {
       icon: <EnvelopeSimpleOpenIcon size={30} className="text-brand-neon-green" />,
@@ -103,6 +123,7 @@ const Home = () => {
           <div className="mx-auto mt-10 flex max-w-lg flex-col gap-4 sm:flex-row sm:justify-center">
             <Button
               size="lg"
+              onClick={handleStartLetter}
               className="
                 h-14
                 px-8
@@ -114,27 +135,48 @@ const Home = () => {
                 transition-colors
                 shadow-lg
                 shadow-brand-neon-green/10
+                flex
+                items-center
+                gap-3
               "
             >
-              Start Your Letter
+              <EnvelopeSimpleIcon
+                size={22}
+                weight="bold"
+              />
+              Start Your Letter   
             </Button>
 
             <Button
               size="lg"
               variant="outline"
+              onClick={handleSecondaryCTA}
               className="
                 h-14
                 px-8
                 rounded-none
                 border-brand-light-grey/30
-                text-white                 /* Explicitly forces the text to be white when normal */
-                bg-transparent             /* Ensures background is clean before hover */
+                text-white
+                bg-transparent
                 hover:bg-white
                 hover:text-brand-bg
                 transition-colors
+                flex
+                items-center
+                gap-3
               "
             >
-              How It Works
+
+            {
+             currentUser ? (
+              <SquaresFourIcon
+                size={22}
+                weight="bold"
+              />
+             ) : null
+            }
+
+            {currentUser ? "Go to Dashboard" : "Create Account"}
             </Button>
           </div>
         </div>

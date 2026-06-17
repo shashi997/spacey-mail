@@ -5,7 +5,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-white/5 bg-brand-bg">
+    <footer className="w-full border-t border-white/10 bg-brand-bg">
       {/* Airmail stripe — mirrors header */}
       <div
         className="h-px w-full"
@@ -16,41 +16,39 @@ const Footer = () => {
         aria-hidden="true"
       />
 
-      <div className="container mx-auto px-4 md:px-6 py-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-8 items-end">
+      <div className="container mx-auto px-4 md:px-6 py-12 md:py-16 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-8 md:gap-12 items-start">
 
         {/* Left: brand blurb */}
-        <div className="space-y-3">
+        <div className="space-y-6 max-w-lg">
           <div className="flex items-center gap-2">
-            <EnvelopeSimple size={16} className="text-brand-neon-green" aria-hidden />
-            <span className="text-sm font-bold text-white font-heading tracking-tight">
+            <EnvelopeSimple size={20} className="text-brand-neon-green" aria-hidden />
+            <span className="text-lg font-bold text-white font-heading tracking-tight">
               Spacey Mail
             </span>
           </div>
-          <p className="text-xs font-mono text-brand-light-grey/30 max-w-xs leading-relaxed">
-            Digital drafts to physical mail. Shipped the next business day,
-            tracked by SMS, received with care.
+          <p className="text-sm font-mono text-brand-light-grey/70 leading-relaxed max-w-md">
+            Our service allows you to easily send letters anytime, without the hassle of paper and pen. 
+            The physical version of the letter you write through our site is printed using special printers, 
+            enveloped, and mailed.
           </p>
-          <p className="text-xs font-mono text-brand-light-grey/20">
+          <p className="text-xs font-mono text-brand-light-grey/40">
             © {year} Spacey Science Ltd. All rights reserved.
           </p>
         </div>
 
-        {/* Right: nav links */}
+        {/* Right: nav links - only essential legal links */}
         <nav
-          className="flex flex-wrap gap-x-8 gap-y-3"
+          className="flex flex-col gap-y-3 md:flex-row md:gap-x-8 md:items-center"
           aria-label="Footer navigation"
         >
           {[
-            { label: "Features", to: "#features" },
-            { label: "Pricing", to: "/pricing" },
-            { label: "About", to: "/about" },
             { label: "Privacy", to: "/privacy" },
             { label: "Terms", to: "/terms" },
           ].map(({ label, to }) => (
             <Link
               key={label}
               to={to}
-              className="text-xs uppercase tracking-widest font-mono text-brand-light-grey/30 hover:text-brand-neon-green transition-colors duration-150"
+              className="text-xs uppercase tracking-widest font-mono text-brand-light-grey/50 hover:text-white transition-colors duration-150"
             >
               {label}
             </Link>
