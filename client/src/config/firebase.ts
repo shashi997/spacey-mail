@@ -8,12 +8,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBhG6XbZcSFyYEdqPQeTmJSjihTTx_QxW4",
-  authDomain: "spacey-mail.firebaseapp.com",
-  projectId: "spacey-mail",
-  storageBucket: "spacey-mail.firebasestorage.app",
-  messagingSenderId: "124953964156",
-  appId: "1:124953964156:web:e3d25aa73edc4b969d23f9"
+  apiKey: "AIzaSyD7yze27YuesgIOiZomeMJq-ebeaP_NsvU",
+  authDomain: "spacey-military.firebaseapp.com",
+  projectId: "spacey-military",
+  storageBucket: "spacey-military.firebasestorage.app",
+  messagingSenderId: "618454858616",
+  appId: "1:618454858616:web:dc25d2e7c125331f2ce68d",
+  measurementId: "G-N7EBP8ET6V"
 };
 
 // Initialize Firebase

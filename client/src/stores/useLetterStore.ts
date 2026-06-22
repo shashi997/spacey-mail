@@ -12,11 +12,14 @@ interface LetterState {
   category: Category | null;
   currentStep: number;
 
+  // Step 1
   subject: string;
-  body: string;
+  body: string;  // Stores Quill HTML output
 
+  // Step 2
   extras: string[];
 
+  // Step 3
   recipientName: string;
   recipientAddress: string;
   senderName: string;
