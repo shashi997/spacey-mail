@@ -36,8 +36,9 @@ export interface LetterDocument {
   userId: string;
   currentStep: number;
   category: LetterCategory;
-  subject: string;
   body: string;
+  bodyDelta?: any;
+  paperColor?: string;
   pageCount: number;
   extras: string[];
   recipient: RecipientInfo;
@@ -53,8 +54,9 @@ export interface LetterDocument {
 export interface CreateLetterDto {
   category: LetterCategory;
   currentStep: number;
-  subject: string;
   body: string;
+  bodyDelta?: any;
+  paperColor?: string;
   extras: string[];
   recipient: RecipientInfo;
   sender: SenderInfo;

@@ -347,7 +347,10 @@ const Dashboard = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-white truncate">
-                          {letter.subject || 'Untitled'}
+                          {(() => {
+                            const txt = letter.body ? new DOMParser().parseFromString(letter.body, 'text/html').body.textContent || '' : '';
+                            return txt.substring(0, 60) || 'Letter draft';
+                          })()}
                         </span>
                         <span className="text-[10px] uppercase font-mono text-brand-light-grey/50 px-1.5 py-0.5 border border-white/10">
                           {letter.category}

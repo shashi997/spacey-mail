@@ -1,15 +1,22 @@
+import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import { auth } from '@/config/firebase';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
-async function getAuthToken(): Promise<string | null> {
-  try {
-    const user = auth.currentUser;
-    return user ? await user.getIdToken() : null;
-  } catch {
-    return null;
+const apiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE,
+  timeout: 10000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+apiClient.interceptors.request.use(async (config) => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
   }
-}
+  return config;
+});
 
 interface ApiSuccess<T> {
   success: true;
@@ -28,31 +35,43 @@ interface ApiError {
 type ApiResult<T> = ApiSuccess<T> | ApiError;
 
 async function request<T>(
+  method: 'get' | 'post' | 'patch',
   path: string,
-  options: RequestInit = {},
+  data?: unknown,
+  signal?: AbortSignal,
 ): Promise<ApiResult<T>> {
-  const token = await getAuthToken();
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-
   try {
-    const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
-    return res.json();
+    const response = await apiClient({ method, url: path, data, signal });
+    
+    // FIX 1: Return response.data directly because your backend 
+    // already envelopes it with { success: true, data: ... }
+    return response.data; 
   } catch (err: any) {
+    if (axios.isCancel(err)) {
+      return { success: false, error: { code: 'CANCELLED', message: 'Request was cancelled' } };
+    }
+
+    const axiosErr = err as AxiosError<any>;
+    
+    // FIX 2: If the server responded with an error structure, return it directly 
+    // to match your old fetch behavior where errors were processed seamlessly.
+    if (axiosErr.response?.data) {
+      return axiosErr.response.data;
+    }
+
+    // Fallback for real network drops/timeout issues
     return {
       success: false,
-      error: { code: 'NETWORK_ERROR', message: err.message || 'Network request failed' },
+      error: { 
+        code: 'NETWORK_ERROR', 
+        message: axiosErr.message || 'Network request failed' 
+      },
     };
   }
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>(path),
-  post: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
-  patch: <T>(path: string, body: unknown) =>
-    request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
+  get: <T>(path: string, signal?: AbortSignal) => request<T>('get', path, undefined, signal),
+  post: <T>(path: string, body: unknown, signal?: AbortSignal) => request<T>('post', path, body, signal),
+  patch: <T>(path: string, body: unknown, signal?: AbortSignal) => request<T>('patch', path, body, signal),
 };

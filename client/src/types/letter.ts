@@ -34,8 +34,9 @@ export interface LetterDocument {
   userId: string;
   currentStep: number;
   category: LetterCategory;
-  subject: string;
   body: string;
+  bodyDelta?: any;
+  paperColor?: string;
   pageCount: number;
   extras: string[];
   recipient: RecipientInfo;

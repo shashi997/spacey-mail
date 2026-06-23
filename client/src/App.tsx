@@ -7,6 +7,7 @@ import NotFound from "./pages/errors/NotFound";
 import Privacy from "./pages/marketing/Privacy";
 import Terms from "./pages/marketing/Terms";
 import Dashboard from "./pages/Dashboard";
+import MyLetters from "./pages/MyLetters";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { RedirectIfAuthenticated } from "./components/RedirectIfAuthenticated";
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -38,6 +39,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/my-letters" element={<MyLetters />} />
         </Route>
 
 

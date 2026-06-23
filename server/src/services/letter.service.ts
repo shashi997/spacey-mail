@@ -9,9 +9,14 @@ const EXTRA_PRICES: Record<string, number> = {
   gift: 250,
 };
 
+function getTextLength(html: string): number {
+  return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length;
+}
+
 function calculatePricing(data: { body: string; extras: string[]; recipient: { type: string } }): LetterDocument['pricing'] {
   let basePriceInCents = 299;
-  const pages = Math.ceil(data.body.length / 2500);
+  const textLen = getTextLength(data.body);
+  const pages = Math.ceil(textLen / 2500);
   if (pages > 1) basePriceInCents += (pages - 1) * 99;
 
   const extrasPriceInCents = (data.extras ?? []).reduce(
@@ -32,7 +37,7 @@ function calculatePricing(data: { body: string; extras: string[]; recipient: { t
 export const letterService = {
   async create(userId: string, data: CreateLetterDto): Promise<LetterDocument> {
     const pricing = calculatePricing(data);
-    const pageCount = Math.ceil(data.body.length / 2500);
+    const pageCount = Math.ceil(getTextLength(data.body) / 2500);
 
     const letterId = await letterRepository.create({
       ...data,
@@ -72,7 +77,7 @@ export const letterService = {
     }
 
     if (data.body) {
-      updateData.pageCount = Math.ceil(String(data.body).length / 2500);
+      updateData.pageCount = Math.ceil(getTextLength(String(data.body)) / 2500);
     }
 
     await letterRepository.update(letterId, updateData);

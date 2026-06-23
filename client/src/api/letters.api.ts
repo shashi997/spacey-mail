@@ -1,12 +1,16 @@
 import { api } from './client';
+import { auth } from '@/config/firebase';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export interface LetterResponse {
   id: string;
   userId: string;
   currentStep: number;
   category: 'prison' | 'soldier' | 'beloved' | 'regular';
-  subject: string;
   body: string;
+  bodyDelta?: any;
+  paperColor?: string;
   pageCount: number;
   extras: string[];
   recipient: {
@@ -60,4 +64,26 @@ export const lettersApi = {
 
   createCheckout: (letterId: string) =>
     api.post<CheckoutResponse>('/create-letter-checkout', { letterId }),
+
+  downloadPdf: async (letterId: string): Promise<void> => {
+    const user = auth.currentUser;
+    const token = user ? await user.getIdToken() : null;
+    const response = await fetch(`${API_BASE}/letters/${letterId}/pdf`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: 'Failed to generate PDF' }));
+      throw new Error(err.error || 'Failed to generate PDF');
+    }
+
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+    setTimeout(() => window.URL.revokeObjectURL(blobUrl), 10000);
+  },
 };

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { ListIcon, UserIcon, LockKeyIcon, XIcon, CaretDownIcon, SquaresFourIcon, SignOutIcon } from "@phosphor-icons/react";
+import { ListIcon, UserIcon, LockKeyIcon, XIcon, CaretDownIcon, SquaresFourIcon, EnvelopeSimpleIcon, SignOutIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -149,6 +149,12 @@ const Header = () => {
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer focus:bg-white/5 focus:text-white">
+                  <Link to="/my-letters">
+                    <EnvelopeSimpleIcon size={16} className="mr-2" aria-hidden="true" />
+                    My Letters
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -237,6 +243,16 @@ const Header = () => {
                 <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                   <SquaresFourIcon size={14} className="mr-2" aria-hidden="true" />
                   Dashboard
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-left text-xs uppercase tracking-widest font-mono text-brand-light-grey/60 hover:text-white hover:bg-brand-dark-grey px-0"
+                asChild
+              >
+                <Link to="/my-letters" onClick={() => setMobileMenuOpen(false)}>
+                  <EnvelopeSimpleIcon size={14} className="mr-2" aria-hidden="true" />
+                  My Letters
                 </Link>
               </Button>
               <Button

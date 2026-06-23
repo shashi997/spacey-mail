@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { useLetterStore } from "@/stores/useLetterStore";
+import { PAPER_COLORS } from "@/components/PaperColorPicker";
 
 const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 
 const Step4Preview = () => {
-  const subject = useLetterStore((s) => s.subject);
   const body = useLetterStore((s) => s.body);
+  const paperColor = useLetterStore((s) => s.paperColor);
   const extras = useLetterStore((s) => s.extras);
   const recipient = useLetterStore((s) => s.recipient);
   const sender = useLetterStore((s) => s.sender);
@@ -20,6 +21,8 @@ const Step4Preview = () => {
     return parts.join(', ');
   };
 
+  const selectedColor = PAPER_COLORS.find((c) => c.value === paperColor) ?? PAPER_COLORS[0];
+
   return (
     <div className="space-y-6">
       <p className="text-brand-light-grey/70 text-sm font-mono">
@@ -27,20 +30,24 @@ const Step4Preview = () => {
       </p>
 
       <div className="space-y-4 rounded-none border border-white/10 bg-brand-dark-grey/40 p-6">
-        <div>
-          <span className="text-[10px] uppercase tracking-widest font-mono text-brand-light-grey/50">
-            Subject
+        <div
+          className="p-6"
+          style={{ backgroundColor: selectedColor.bg, color: '#1a1a1a' }}
+        >
+          <span className="text-[10px] uppercase tracking-widest font-mono opacity-50">
+            Your letter
           </span>
-          <p className="mt-1 text-base font-medium text-white">{subject || '(No subject)'}</p>
-        </div>
-
-        <div>
-          <span className="text-[10px] uppercase tracking-widest font-mono text-brand-light-grey/50">
-            Letter
-          </span>
-          <p className="mt-1 text-sm leading-relaxed text-brand-light-grey/90 whitespace-pre-wrap">
-            {body || '(No content)'}
-          </p>
+          <div
+            className="mt-2 text-sm leading-relaxed"
+            style={{
+              overflowWrap: 'break-word',
+              wordBreak: 'break-word',
+              whiteSpace: 'normal',
+              maxWidth: '100%',
+              lineHeight: 1.6,
+            }}
+            dangerouslySetInnerHTML={{ __html: body || '<em>No content yet</em>' }}
+          />
         </div>
 
         {extras.length > 0 && (

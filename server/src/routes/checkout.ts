@@ -42,7 +42,7 @@ router.post('/create-letter-checkout', requireAuth, async (req, res, next) => {
             currency: 'usd',
             product_data: {
               name: 'Physical Letter Print & Delivery',
-              description: letter.subject || 'Custom letter',
+              description: 'Physical Letter Print & Delivery',
             },
             unit_amount: letter.pricing.totalPriceInCents,
           },

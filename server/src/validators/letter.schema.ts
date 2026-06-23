@@ -33,8 +33,9 @@ const senderInfoSchema = z.object({
 export const createLetterSchema = z.object({
   category: z.enum(['prison', 'soldier', 'beloved', 'regular']),
   currentStep: z.number().int().min(0).max(4).default(0),
-  subject: z.string().max(200).default(''),
-  body: z.string().max(10000).default(''),
+  body: z.string().max(50000).default(''),
+  bodyDelta: z.any().optional(),
+  paperColor: z.string().max(20).default('white'),
   extras: z.array(z.enum(['photo', 'sticker', 'drawing', 'gift'])).max(10).default([]),
   recipient: recipientInfoSchema,
   sender: senderInfoSchema,
@@ -42,8 +43,7 @@ export const createLetterSchema = z.object({
 
 // ─── Checkout: strict validation before payment ───
 export const checkoutLetterSchema = createLetterSchema.extend({
-  subject: z.string().min(1, 'Subject is required').max(200),
-  body: z.string().min(1, 'Letter body is required').max(10000),
+  body: z.string().min(1, 'Letter body is required').max(50000),
   sender: senderInfoSchema.extend({
     addressLine1: z.string().min(1, 'Sender address is required').max(200),
     city: z.string().min(1, 'Sender city is required').max(100),

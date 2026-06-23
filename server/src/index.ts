@@ -6,6 +6,7 @@ import './config/firebaseadmin.js';
 import webhooksRouter from './routes/webhooks.js';
 import lettersRouter from './routes/letters.routes.js';
 import checkoutRouter from './routes/checkout.js';
+import pdfRouter from './routes/pdf.routes.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 
 const app = express();
@@ -22,6 +23,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/letters', lettersRouter);
+app.use('/api/letters', pdfRouter);
 app.use('/api', checkoutRouter);
 
 app.use(errorHandler);

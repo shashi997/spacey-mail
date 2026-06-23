@@ -10,9 +10,15 @@ export function isValidCategory(value: string): value is Category {
   return VALID_CATEGORIES.includes(value as Category);
 }
 
+function stripHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
+}
+
 function calculatePricing(body: string, extras: string[], recipientType: string): LetterPricing {
   let basePriceInCents = 299;
-  const pages = Math.ceil(body.length / 2500);
+  const text = stripHtml(body);
+  const pages = Math.ceil(text.length / 2500);
   if (pages > 1) basePriceInCents += (pages - 1) * 99;
 
   const extraPrices: Record<string, number> = {
@@ -38,8 +44,9 @@ interface LetterState {
 
   isSaving: boolean;
 
-  subject: string;
   body: string;
+  bodyDelta: any;
+  paperColor: string;
 
   extras: string[];
 
@@ -56,7 +63,7 @@ interface LetterState {
   goToStep: (step: number) => void;
   setLetterId: (id: string | null) => void;
 
-  updateStep1: (data: { subject?: string; body?: string }) => void;
+  updateStep1: (data: { body?: string; bodyDelta?: any; paperColor?: string }) => void;
   updateStep2: (data: { extras?: string[] }) => void;
   updateStep3: (data: { recipient?: Partial<RecipientInfo>; sender?: Partial<SenderInfo> }) => void;
 
@@ -103,8 +110,9 @@ export const useLetterStore = create<LetterState>((set, get) => ({
 
   isSaving: false,
 
-  subject: '',
   body: '',
+  bodyDelta: null,
+  paperColor: 'white',
 
   extras: [],
 
@@ -133,10 +141,11 @@ export const useLetterStore = create<LetterState>((set, get) => ({
 
   updateStep1: (data) =>
     set((state) => {
-      const subject = data.subject ?? state.subject;
       const body = data.body ?? state.body;
+      const bodyDelta = data.bodyDelta !== undefined ? data.bodyDelta : state.bodyDelta;
+      const paperColor = data.paperColor ?? state.paperColor;
       const pricing = calculatePricing(body, state.extras, state.recipient.type);
-      return { subject, body, pricing };
+      return { body, bodyDelta, paperColor, pricing };
     }),
 
   updateStep2: (data) =>
@@ -171,8 +180,9 @@ export const useLetterStore = create<LetterState>((set, get) => ({
     const letterData = {
       category: state.category,
       currentStep: state.currentStep,
-      subject: state.subject,
       body: state.body,
+      bodyDelta: state.bodyDelta,
+      paperColor: state.paperColor,
       extras: state.extras,
       recipient: state.recipient,
       sender: state.sender,
@@ -207,8 +217,9 @@ export const useLetterStore = create<LetterState>((set, get) => ({
         letterId: letter.id,
         category: letter.category,
         currentStep: letter.currentStep,
-        subject: letter.subject,
         body: letter.body,
+        bodyDelta: letter.bodyDelta ?? null,
+        paperColor: letter.paperColor ?? 'white',
         extras: letter.extras,
         recipient: letter.recipient,
         sender: letter.sender,
@@ -228,8 +239,9 @@ export const useLetterStore = create<LetterState>((set, get) => ({
       currentStep: 0,
       letterId: null,
       isSaving: false,
-      subject: '',
       body: '',
+      bodyDelta: null,
+      paperColor: 'white',
       extras: [],
       recipient: { ...defaultRecipient },
       sender: { ...defaultSender },

@@ -19,8 +19,7 @@ const Step5Checkout = () => {
   const validate = (): string | null => {
     const s = useLetterStore.getState();
 
-    if (!s.subject.trim()) return 'Step 1: Subject is required';
-    if (!s.body.trim()) return 'Step 1: Letter body is required';
+    if (!s.body || s.body === '<p><br></p>') return 'Step 1: Letter body is required';
 
     if (!s.recipient.name.trim()) return 'Step 3: Recipient name is required';
     if (!s.recipient.addressLine1.trim()) return 'Step 3: Recipient address is required';
@@ -58,8 +57,9 @@ const Step5Checkout = () => {
       const letterData = {
         category: storeState.category,
         currentStep: storeState.currentStep,
-        subject: storeState.subject,
         body: storeState.body,
+        bodyDelta: storeState.bodyDelta,
+        paperColor: storeState.paperColor,
         extras: storeState.extras,
         recipient: storeState.recipient,
         sender: storeState.sender,
