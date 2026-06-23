@@ -86,7 +86,7 @@ const LetterWizard = () => {
                 </div>
                 {i < STEP_LABELS.length - 1 && (
                   <div
-                    className={`mx-2 mt-[-1.25rem] h-px w-10 sm:w-16 ${
+                    className={`mx-2 -mt-5 h-px w-10 sm:w-16 ${
                       i < currentStep
                         ? "bg-brand-neon-green/50"
                         : "bg-white/10"

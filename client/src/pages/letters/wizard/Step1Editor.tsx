@@ -58,7 +58,7 @@ const Step1Editor = () => {
             placeholder="Start writing your letter here..."
             value={body}
             onChange={(e) => updateStep1({ body: e.target.value })}
-            className="min-h-[250px] text-base bg-brand-dark-grey/80 border-white/20 focus:border-brand-neon-green focus:ring-brand-neon-green/30 text-white placeholder:text-brand-light-grey/50"
+            className="min-h-62.5 text-base bg-brand-dark-grey/80 border-white/20 focus:border-brand-neon-green focus:ring-brand-neon-green/30 text-white placeholder:text-brand-light-grey/50"
           />
         </div>
 

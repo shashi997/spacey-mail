@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { FirebaseError } from "firebase/app";
 import {
   EnvelopeSimple,
@@ -7,6 +7,7 @@ import {
   CircleNotch,
   Check,
   X,
+  ArrowRight,
 } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { lettersApi, type LetterResponse } from "@/api/letters.api";
+import { useNavigate } from "react-router";
 
 const getErrorMessage = (err: unknown): string => {
   if (err instanceof FirebaseError) {
@@ -29,7 +32,30 @@ const getErrorMessage = (err: unknown): string => {
   return "Something went wrong. Please try again.";
 };
 
+const STATUS_COLORS: Record<string, string> = {
+  draft: 'text-yellow-400',
+  processing: 'text-brand-neon-blue',
+  paid: 'text-brand-neon-green',
+  failed: 'text-red-400',
+  refunded: 'text-brand-light-grey/60',
+  unpaid: 'text-yellow-400',
+  pending_print: 'text-brand-neon-blue',
+  printing: 'text-brand-neon-blue',
+  shipped: 'text-brand-neon-green',
+  delivered: 'text-brand-neon-green',
+  returned: 'text-red-400',
+};
+
+const formatDate = (timestamp: any): string => {
+  if (!timestamp) return '';
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  });
+};
+
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { currentUser, logout, updateUserProfile } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -39,9 +65,25 @@ const Dashboard = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  const [letters, setLetters] = useState<LetterResponse[]>([]);
+  const [lettersLoading, setLettersLoading] = useState(true);
+  const [lettersError, setLettersError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    setLettersLoading(true);
+    lettersApi.list().then((res) => {
+      if (res.success) {
+        setLetters(res.data);
+        setLettersError(null);
+      } else {
+        setLettersError(res.error.message);
+      }
+      setLettersLoading(false);
+    });
+  }, [currentUser]);
+
   const startEditing = () => {
-    // Reset fields to current values each time editing starts, in case
-    // a previous edit was cancelled mid-way.
     setFirstName(currentUser?.firstName ?? "");
     setLastName(currentUser?.lastName ?? "");
     setSaveError(null);
@@ -151,11 +193,11 @@ const Dashboard = () => {
                   aria-hidden="true"
                   className="flex h-14 w-14 shrink-0 items-center justify-center bg-brand-neon-green/15 font-heading text-lg font-semibold text-brand-neon-green"
                 >
-                  {initials || "—"}
+                  {initials || "\u2014"}
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-lg font-medium text-white font-heading">
-                    {fullName || "—"}
+                    {fullName || "\u2014"}
                   </p>
                   <p className="text-sm font-mono text-brand-light-grey/70">
                     {currentUser?.email}
@@ -256,24 +298,86 @@ const Dashboard = () => {
 
         {/* Letters section */}
         <section className="mt-8 border border-white/10 bg-brand-dark-grey/40">
-          <div className="border-b border-white/10 px-5 py-4 sm:px-6">
+          <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
             <h2 className="text-sm uppercase tracking-widest font-mono text-brand-light-grey/80">
               Your letters
             </h2>
+            <Button
+              asChild
+              variant="ghost"
+              className="text-xs font-mono uppercase tracking-widest text-brand-neon-green hover:text-brand-neon-blue px-0"
+            >
+              <a href="/letter">
+                New letter
+                <ArrowRight size={14} className="ml-1" />
+              </a>
+            </Button>
           </div>
 
-          <div className="flex flex-col items-center gap-3 px-5 py-12 text-center sm:px-6">
-            <EnvelopeSimple
-              size={36}
-              className="text-brand-light-grey/30"
-              aria-hidden="true"
-            />
-            <p className="font-mono text-base text-brand-light-grey/70">
-              You haven't written any letters yet.
-            </p>
-            <p className="max-w-sm font-mono text-sm text-brand-light-grey/50">
-              Letters you draft or send will show up here.
-            </p>
+          <div className="px-5 py-6 sm:px-6">
+            {lettersLoading ? (
+              <div className="flex justify-center py-8">
+                <CircleNotch size={24} className="animate-spin text-brand-neon-green" />
+              </div>
+            ) : lettersError ? (
+              <div className="rounded-none border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm font-mono text-red-300">
+                {lettersError}
+              </div>
+            ) : letters.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <EnvelopeSimple
+                  size={36}
+                  className="text-brand-light-grey/30"
+                  aria-hidden="true"
+                />
+                <p className="font-mono text-base text-brand-light-grey/70">
+                  You haven't written any letters yet.
+                </p>
+                <p className="max-w-sm font-mono text-sm text-brand-light-grey/50">
+                  Letters you draft or send will show up here.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {letters.map((letter) => (
+                  <div
+                    key={letter.id}
+                    className="flex items-center justify-between border border-white/10 bg-brand-dark-grey/20 px-4 py-3 transition-colors hover:border-white/20"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-white truncate">
+                          {letter.subject || 'Untitled'}
+                        </span>
+                        <span className="text-[10px] uppercase font-mono text-brand-light-grey/50 px-1.5 py-0.5 border border-white/10">
+                          {letter.category}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-3 text-xs font-mono text-brand-light-grey/60">
+                        <span>To: {letter.recipient.name}</span>
+                        <span>&middot;</span>
+                        <span>{formatDate(letter.createdAt)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 ml-4">
+                      <span className={`text-[10px] uppercase font-mono font-bold ${STATUS_COLORS[letter.paymentStatus] || 'text-brand-light-grey/50'}`}>
+                        {letter.paymentStatus}
+                      </span>
+                      {letter.paymentStatus === 'draft' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/letter/${letter.category}`)}
+                          className="text-[10px] font-mono uppercase tracking-wider rounded-none border-white/20 bg-transparent text-brand-neon-green hover:bg-white/5 h-7 px-3"
+                        >
+                          Continue
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>

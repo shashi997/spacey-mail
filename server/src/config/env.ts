@@ -19,4 +19,7 @@ export const ENV = {
   PORT: process.env.PORT || 8080,
   NODE_ENV: process.env.NODE_ENV || 'development',
   IS_CLOUD_RUN: isCloudRun,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string, // Obtained from Stripe Dashboard/CLI
+  CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173', // Your React app URL
 } as const;  // 'as const' makes the properties read-only
