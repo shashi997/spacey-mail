@@ -10,7 +10,7 @@ const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const Step5Checkout = () => {
   const { currentUser } = useAuth();
   const prevStep = useLetterStore((s) => s.prevStep);
-  const goToStep = useLetterStore((s) => s.goToStep);
+  // const goToStep = useLetterStore((s) => s.goToStep);
   const store = useLetterStore.getState();
 
   const [sending, setSending] = useState(false);

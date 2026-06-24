@@ -16,7 +16,7 @@ interface PaperColorPickerProps {
 }
 
 const PaperColorPicker: React.FC<PaperColorPickerProps> = ({ value, onChange }) => {
-  const selected = PAPER_COLORS.find((c) => c.value === value) ?? PAPER_COLORS[0];
+  // const selected = PAPER_COLORS.find((c) => c.value === value) ?? PAPER_COLORS[0];
 
   return (
     <div className="space-y-2">

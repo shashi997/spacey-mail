@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { EnvelopeSimple, CircleNotch, FilePdf, ArrowRight } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { lettersApi, type LetterResponse } from "@/api/letters.api";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 
 const STATUS_COLORS: Record<string, string> = {
   draft: 'text-yellow-400',
@@ -27,7 +27,7 @@ const formatDate = (timestamp: any): string => {
 };
 
 const MyLetters = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [letters, setLetters] = useState<LetterResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
